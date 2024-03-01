@@ -18,8 +18,8 @@ local Data = require(ServerScriptService:WaitForChild("Server"):WaitForChild("Da
 -- Variables
 
 local Locations = {
-    [1] = {["CFrame"] = CFrame.new(25,0,0), ["Occupied"] = false},
-    [2] = {["CFrame"] = CFrame.new(-25,0,0), ["Occupied"] = false},
+    [1] = {["CFrame"] = CFrame.new(25,.5,0), ["Occupied"] = false},
+    [2] = {["CFrame"] = CFrame.new(-25,.5,0), ["Occupied"] = false},
 }
 
 local TycoonTemplate = ReplicatedStorage:WaitForChild("TycoonTemplate")
@@ -55,8 +55,8 @@ local function ItemSetup(ID, Owned, Player: Player, PlayerData: table, PlayerTyc
             
             PlayerTycoon:WaitForChild("Buttons"):WaitForChild(ID).Transparency = 1
             PlayerTycoon:WaitForChild("Items"):WaitForChild(ID).Transparency = 1
-        elseif PlayerData["Tycoon"][Settings.Tycoon[ID]["Dependency"]] == 1 then
-            -- player does own dependency, set item to invisble but keep button visible
+        elseif PlayerData["Tycoon"][Settings.Tycoon[ID]["Dependency"]] == 1 or Settings.Tycoon[ID]["Dependency"] == nil then
+            -- player does own dependency(or there is no dependency), set item to invisble but keep button visible
 
             PlayerTycoon:WaitForChild("Items"):WaitForChild(ID).Transparency = 1
         end
