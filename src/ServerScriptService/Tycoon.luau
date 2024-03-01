@@ -27,6 +27,10 @@ local TycoonsFolder = workspace:WaitForChild("Tycoons")
 
 -- Functions
 
+function Tycoon.Listen(Player: Player, PlayerTycoon: Model)
+
+end
+
 function Tycoon.Add(Player: Player)
     local PlayerTycoon: Model = TycoonTemplate:Clone()
     PlayerTycoon.Name = Player.Name
@@ -53,12 +57,22 @@ local function ItemSetup(ID, Owned, Player: Player, PlayerData: table, PlayerTyc
         if PlayerData["Tycoon"][Settings.Tycoon[ID]["Dependency"]] == 0 then
             -- player does not own dependency, set item & button to invisible
             
-            PlayerTycoon:WaitForChild("Buttons"):WaitForChild(ID).Transparency = 1
-            PlayerTycoon:WaitForChild("Items"):WaitForChild(ID).Transparency = 1
+            for _, Part in pairs(PlayerTycoon:WaitForChild("Buttons"):WaitForChild(ID):WaitForChild("Build"):GetChildren()) do
+                Part.Transparency = 1
+                Part.CanCollide = false
+            end
+
+            for _, Part in pairs(PlayerTycoon:WaitForChild("Items"):WaitForChild(ID):WaitForChild("Build"):GetChildren()) do
+                Part.Transparency = 1
+                Part.CanCollide = false
+            end
         elseif PlayerData["Tycoon"][Settings.Tycoon[ID]["Dependency"]] == 1 or Settings.Tycoon[ID]["Dependency"] == nil then
             -- player does own dependency(or there is no dependency), set item to invisble but keep button visible
 
-            PlayerTycoon:WaitForChild("Items"):WaitForChild(ID).Transparency = 1
+            for _, Part in pairs(PlayerTycoon:WaitForChild("Items"):WaitForChild(ID):WaitForChild("Build"):GetChildren()) do
+                Part.Transparency = 1
+                Part.CanCollide = false
+            end
         end
     end
 end

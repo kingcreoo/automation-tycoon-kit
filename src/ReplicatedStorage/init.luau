@@ -13,21 +13,37 @@ Settings.DefaultData = {
 	}
 }
 
+-- Types {
+--		"Decoration" - decorations
+--		"Monetary" - things that earn money
+--		"Defense" - active defenses
+--		"Amenity" - vehicles & weapons
+--}
+
 Settings.Tycoon = {
 	[1] = {
 		["Name"] = "Item1",
 		["Price"] = 100,
-		["Dependency"] = nil
+		["Currency"] = "Credits",
+		["Dependency"] = nil,
+		["Type"] = "Decoration",
+		["Animation"] = nil
 	},
 	[2] = {
 		["Name"] = "Item2",
 		["Price"] = 200,
-		["Dependency"] = 1
+		["Currency"] = "Credits",
+		["Dependency"] = 1,
+		["Type"] = "Decoration",
+		["Animation"] = nil
 	},
 	[3] = {
 		["Name"] = "Item3",
 		["Price"] = 300,
-		["Dependency"] = 2
+		["Currency"] = "Credits",
+		["Dependency"] = 2,
+		["Type"] = "Decoration",
+		["Animation"] = nil
 	}
 }
 
