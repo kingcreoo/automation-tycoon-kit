@@ -22,7 +22,7 @@ local DataStore = DataStoreService:GetDataStore("DATA_STORE")
 local DataBase = {}
 local Saves = {}
 
--- Functions
+-- Local Functions
 
 local function DeepCopy(Table)
     local Copy = {}
@@ -38,6 +38,14 @@ local function DeepCopy(Table)
     return Copy
 end
 
+local function UpdateLeaderstats(Player: Player, PlayerData: table)
+    for _, Stat in pairs(Player:WaitForChild("leaderstats"):GetChildren()) do
+        Stat.Value = PlayerData[Stat.Name]
+    end
+end
+
+-- Module Functions
+
 function Data.NewPlayer(Player: Player)
     local PlayerData = DeepCopy(Settings.DefaultData)
     Data.Set(Player, PlayerData)
@@ -47,6 +55,8 @@ end
 
 function Data.Set(Player: Player, PlayerData: table)
     DataBase[Player.Name] = PlayerData -- first of all set the player's data within this module
+
+    UpdateLeaderstats(Player, PlayerData) -- update the player's leaderstats
 
     -- leaderstats stuff will go here (if we do it)
 

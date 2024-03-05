@@ -25,6 +25,8 @@ local Locations = {
 local TycoonTemplate = ReplicatedStorage:WaitForChild("TycoonTemplate")
 local TycoonsFolder = workspace:WaitForChild("Tycoons")
 
+local ToCollect = {}
+
 -- Local Functions
 
 local function ItemSetup(ID, Owned, Player: Player, PlayerData: table, PlayerTycoon: Model, startUp: boolean)
@@ -134,6 +136,36 @@ function Tycoon.Listen(Player: Player, PlayerTycoon: Model)
             DEBOUNCE = false
         end)
     end
+
+    PlayerTycoon:WaitForChild("Collector"):WaitForChild("Touch").Touched:Connect(function(hit)
+        if hit.Parent.Name ~= Player.Name and not hit.Parent:FindFirstChild("Humanoid") then
+            return
+        end
+
+        Tycoon.Collect(Player, PlayerTycoon)
+    end)
+end
+
+function Tycoon.Economy(Player: Player, PlayerTycoon: Model)
+    while true do
+        task.wait(2)
+
+        for ID, Owned in pairs(Data.Get(Player)["Tycoon"]) do
+            if Settings.Tycoon[ID]["Type"] == "Economy" and Owned == 1 then
+                ToCollect[Player.Name] += (Settings.Tycoon[ID]["CPS"])
+            end
+        end
+    end
+end
+
+function Tycoon.Collect(Player: Player, PlayerTycoon: Model)
+    local PlayerData = Data.Get(Player)
+    PlayerData["Credits"] += ToCollect[Player.Name]
+    ToCollect[Player.Name] = 0
+
+    Data.Set(Player, PlayerData)
+
+    -- animation here
 end
 
 function Tycoon.Add(Player: Player)
@@ -152,6 +184,8 @@ function Tycoon.Add(Player: Player)
     PlayerTycoon:SetPrimaryPartCFrame(Locations[SelectedLocation]["CFrame"])
     PlayerTycoon:SetAttribute("Location", SelectedLocation)
 
+    ToCollect[Player.Name] = 0
+
     return PlayerTycoon
 end
 
@@ -163,6 +197,8 @@ end
 
 function Tycoon.Remove(Player: Player)
     local PlayerTycoon = TycoonsFolder:WaitForChild(Player.Name)
+
+    ToCollect[Player.Name] = nil
 
     -- save player's tycoon data here.
 

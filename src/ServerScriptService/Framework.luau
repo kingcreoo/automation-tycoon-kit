@@ -22,7 +22,7 @@ local Tycoon = require(ServerScriptService:WaitForChild("Server"):WaitForChild("
 
 local DataStore = DataStoreService:GetDataStore("DATA_STORE")
 
--- Functions
+-- Local Functions
 
 local function DeepReconcile(Table0 --[[Default data]], Table1 --[[Player's data]])
     for k, v in pairs(Table0) do
@@ -40,9 +40,26 @@ local function DeepReconcile(Table0 --[[Default data]], Table1 --[[Player's data
     return Table0
 end
 
+local function PlayerSetup(Player: Player)
+    local leaderstats = Instance.new("Folder")
+    leaderstats.Parent = Player
+    leaderstats.Name = "leaderstats"
+
+    local Credits = Instance.new("IntValue")
+    Credits.Parent = leaderstats
+    Credits.Name = "Credits"
+
+    local Rebirths = Instance.new("IntValue")
+    Rebirths.Parent = leaderstats
+    Rebirths.Name = "Rebirths"
+end
+
+-- Module Functions
+
 function Framework.Join(Player: Player)
-    -- part 0, move character
+    -- part 0, move character & setup player
     local Character = Player.Character or Player.CharacterAdded:Wait()
+    PlayerSetup(Player)
 
     -- part 1, data
 
@@ -63,6 +80,10 @@ function Framework.Join(Player: Player)
     local PlayerTycoon = Tycoon.Add(Player)
     Tycoon.Load(Player, PlayerData, PlayerTycoon)
     Tycoon.Listen(Player, PlayerTycoon)
+
+    coroutine.wrap(function()
+        Tycoon.Economy(Player, PlayerTycoon)
+    end)()
 
     -- part 3, finish up
 
