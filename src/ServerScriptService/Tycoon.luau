@@ -25,33 +25,10 @@ local Locations = {
 local TycoonTemplate = ReplicatedStorage:WaitForChild("TycoonTemplate")
 local TycoonsFolder = workspace:WaitForChild("Tycoons")
 
--- Functions
+-- Local Functions
 
-function Tycoon.Listen(Player: Player, PlayerTycoon: Model)
-
-end
-
-function Tycoon.Add(Player: Player)
-    local PlayerTycoon: Model = TycoonTemplate:Clone()
-    PlayerTycoon.Name = Player.Name
-    PlayerTycoon.Parent = TycoonsFolder
-
-    local SelectedLocation
-    for Number, Info in pairs(Locations) do
-        if Info["Occupied"] then continue end
-
-        SelectedLocation = Number
-    end
-
-    Locations[SelectedLocation]["Occupied"] = true
-    PlayerTycoon:SetPrimaryPartCFrame(Locations[SelectedLocation]["CFrame"])
-    PlayerTycoon:SetAttribute("Location", SelectedLocation)
-
-    return PlayerTycoon
-end
-
-local function ItemSetup(ID, Owned, Player: Player, PlayerData: table, PlayerTycoon: Model)
-    if Owned == 1 then
+local function ItemSetup(ID, Owned, Player: Player, PlayerData: table, PlayerTycoon: Model, startUp: boolean)
+    if Owned == 1 and startUp then
         PlayerTycoon:WaitForChild("Buttons"):WaitForChild(ID):Destroy()
     elseif Owned == 0 then
         if PlayerData["Tycoon"][Settings.Tycoon[ID]["Dependency"]] == 0 then
@@ -77,9 +54,110 @@ local function ItemSetup(ID, Owned, Player: Player, PlayerData: table, PlayerTyc
     end
 end
 
-function Tycoon.Load(Player: Player, PlayerData: table, PlayerTycoon: Model)
+-- Module Functions
+
+function Tycoon.DevProductPurchase()
+
+end
+
+function Tycoon.Purchase(Button: Model, Player: Player, PlayerTycoon: Model)
+    local PlayerData = Data.Get(Player)
+
+    -- Check 0: Does player already own this item? Does player not own the dependency for this item?
+    if PlayerData["Tycoon"][tonumber(Button.Name)] == 1 or Settings.Tycoon[tonumber(Button.Name)]["Dependency"] and PlayerData["Tycoon"][Settings.Tycoon[tonumber(Button.Name)]["Dependency"]] == 0 then
+        -- player already owns this item or does not own the depdency for this item
+        warn("player already owns this item or does not own the depdency for this item")
+        return
+    end
+
+    -- Check 1: Does player have enough rebirths to purchase this item?
+    if PlayerData["Rebirths"] < Settings.Tycoon[tonumber(Button.Name)]["Rebirths"] then
+        -- player does not have enough rebirths to purchase this item
+        warn("player does not have enough rebirths to purchase this item")
+        return
+    end
+
+    -- Check 2: Does player have enough currency to purchase this item?
+    if PlayerData[Settings.Tycoon[tonumber(Button.Name)]["Currency"]] < Settings.Tycoon[tonumber(Button.Name)]["Price"] then
+        -- player does not have credits/rebirth tokens to purchase this item
+        warn("player does not have credits/rebirth tokens to purchase this item")
+        return
+    end
+
+    -- Player has passed all checks.
+    PlayerData[Settings.Tycoon[tonumber(Button.Name)]["Currency"]] -= Settings.Tycoon[tonumber(Button.Name)]["Price"] -- Remove player's credits/rebirth tokens
+    PlayerData["Tycoon"][tonumber(Button.Name)] = 1 -- Award player the item in their data
+
+    Data.Set(Player, PlayerData) -- Set player data
+    print(PlayerData)
+
+    for _, Part in pairs(PlayerTycoon:WaitForChild("Items"):WaitForChild(Button.Name):WaitForChild("Preview"):GetChildren()) do -- destroy the preview
+        Part:Destroy()
+    end
+
+    for _, Part in pairs(PlayerTycoon:WaitForChild("Items"):WaitForChild(Button.Name):WaitForChild("Build"):GetChildren()) do -- activate build parts
+        Part.Transparency = 0
+        Part.CanCollide = true
+    end
+
+    Button:Destroy() -- destroy button
+
     for ID, Owned in pairs(PlayerData["Tycoon"]) do -- for each item in the tycoon, run a setup function (see function above)
         ItemSetup(ID, Owned, Player, PlayerData, PlayerTycoon)
+    end
+end
+
+function Tycoon.Listen(Player: Player, PlayerTycoon: Model)
+    for _, Button: Model in pairs(PlayerTycoon:WaitForChild("Buttons"):GetChildren()) do
+        local Touch = Button:WaitForChild("Touch")
+        local DEBOUNCE = false
+
+        Touch.Touched:Connect(function(hit)
+            if hit.Parent.Name ~= Player.Name or not hit.Parent:FindFirstChild("Humanoid") or DEBOUNCE then
+                return
+            end
+
+            DEBOUNCE = true
+
+            if Settings.Tycoon[tonumber(Button.Name)]["Currency"] == "DevProduct" then -- this is a robux purchase
+                Tycoon.DevProductPurchase()
+
+                return
+            end
+
+            -- this is a standard purchase
+
+            Tycoon.Purchase(Button, Player, PlayerTycoon)
+
+            task.wait(1)
+
+            DEBOUNCE = false
+        end)
+    end
+end
+
+function Tycoon.Add(Player: Player)
+    local PlayerTycoon: Model = TycoonTemplate:Clone()
+    PlayerTycoon.Name = Player.Name
+    PlayerTycoon.Parent = TycoonsFolder
+
+    local SelectedLocation
+    for Number, Info in pairs(Locations) do
+        if Info["Occupied"] then continue end
+
+        SelectedLocation = Number
+    end
+
+    Locations[SelectedLocation]["Occupied"] = true
+    PlayerTycoon:SetPrimaryPartCFrame(Locations[SelectedLocation]["CFrame"])
+    PlayerTycoon:SetAttribute("Location", SelectedLocation)
+
+    return PlayerTycoon
+end
+
+function Tycoon.Load(Player: Player, PlayerData: table, PlayerTycoon: Model)
+    for ID, Owned in pairs(PlayerData["Tycoon"]) do -- for each item in the tycoon, run a setup function (see itemsetup function above)
+        ItemSetup(ID, Owned, Player, PlayerData, PlayerTycoon, true)
     end
 end
 

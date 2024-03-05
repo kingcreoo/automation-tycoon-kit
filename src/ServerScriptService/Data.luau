@@ -18,7 +18,7 @@ local Settings = require(ReplicatedStorage:WaitForChild("Settings"))
 
 -- Variables
 
-local DataStore = DataStoreService:GetDataStore("_DataStore_")
+local DataStore = DataStoreService:GetDataStore("DATA_STORE")
 local DataBase = {}
 local Saves = {}
 

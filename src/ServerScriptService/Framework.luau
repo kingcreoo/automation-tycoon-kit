@@ -20,7 +20,7 @@ local Tycoon = require(ServerScriptService:WaitForChild("Server"):WaitForChild("
 
 -- Variables
 
-local DataStore = DataStoreService:GetDataStore("_DataStore_")
+local DataStore = DataStoreService:GetDataStore("DATA_STORE")
 
 -- Functions
 
@@ -36,6 +36,8 @@ local function DeepReconcile(Table0 --[[Default data]], Table1 --[[Player's data
             end
         end
     end
+
+    return Table0
 end
 
 function Framework.Join(Player: Player)
@@ -55,12 +57,12 @@ function Framework.Join(Player: Player)
     end
 
     Data.Set(Player, PlayerData)
-    print(PlayerData)
 
     -- part 2, tycoon
 
     local PlayerTycoon = Tycoon.Add(Player)
     Tycoon.Load(Player, PlayerData, PlayerTycoon)
+    Tycoon.Listen(Player, PlayerTycoon)
 
     -- part 3, finish up
 

@@ -5,7 +5,8 @@ local Settings = {}
 Settings.DefaultData = {
 	["Version"] = Settings.Version,
 	["LeaveTime"] = nil,
-	["Cash"] = 100,
+	["Credits"] = 100,
+	["Rebirths"] = 0,
 	["Tycoon"] = {
 		[1] = 0,
 		[2] = 0,
@@ -27,7 +28,8 @@ Settings.Tycoon = {
 		["Currency"] = "Credits",
 		["Dependency"] = nil,
 		["Type"] = "Decoration",
-		["Animation"] = nil
+		["Animation"] = nil,
+		["Rebirths"] = 0
 	},
 	[2] = {
 		["Name"] = "Item2",
@@ -35,7 +37,8 @@ Settings.Tycoon = {
 		["Currency"] = "Credits",
 		["Dependency"] = 1,
 		["Type"] = "Decoration",
-		["Animation"] = nil
+		["Animation"] = nil,
+		["Rebirths"] = 0
 	},
 	[3] = {
 		["Name"] = "Item3",
@@ -43,7 +46,8 @@ Settings.Tycoon = {
 		["Currency"] = "Credits",
 		["Dependency"] = 2,
 		["Type"] = "Decoration",
-		["Animation"] = nil
+		["Animation"] = nil,
+		["Rebirths"] = 0
 	}
 }
 
